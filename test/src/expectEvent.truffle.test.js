@@ -468,6 +468,20 @@ contract('expectEvent (truffle contracts)', function ([deployer]) {
       });
     });
 
+    describe('when emitting uint indirectly', function () {
+      beforeEach(async function () {
+        this.value = new BN(1);
+        const { receipt } = await this.emitter.emitUintIndirectly(this.value, this.secondEmitter.address);
+        this.txHash = receipt.transactionHash;
+      });
+
+      it('accepts events with uint emitted from other contracts', async function () {
+        await expectEvent.inTransaction(this.txHash, IndirectEventEmitter, 'IndirectUint',
+          { value: this.value }
+        );
+      });
+    });
+
     describe('with non-unique event names', function () {
       it('throws', async function () {
         const { transactionHash } = await this.emitter.emitRepeated('0x');
